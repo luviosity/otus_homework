@@ -1,0 +1,86 @@
+{% extends "_base.html" %}
+
+{% block title %}
+Добавить книгу
+{% endblock %}
+
+{% block main_content %}
+<div class="container" style="max-width: 600px; margin-top: 30px;">
+    <h1 style="text-align: center; margin-bottom: 30px;">Добавить новую книгу</h1>
+
+    <form method="post" action="{{ url_for('book_create_post') }}">
+        <div class="mb-3">
+            <label for="author" class="form-label">Автор</label>
+            <input type="text" class="form-control" id="author" name="author"
+                   value="{{ form_data.author if form_data else '' }}"
+                   placeholder="Лев Толстой"
+                   minlength="5" maxlength="100" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="title" class="form-label">Название</label>
+            <input type="text" class="form-control" id="title" name="title"
+                   value="{{ form_data.title if form_data else '' }}"
+                   placeholder="Война и Мир"
+                   minlength="5" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="genre" class="form-label">Жанр</label>
+            <select class="form-select" id="genre" name="genre" required>
+                <option value="" disabled {% if not form_data %}selected{% endif %}>Выберите жанр</option>
+                {% for g in genres %}
+                <option value="{{ g.value }}" {% if form_data and form_data.genre == g.value %}selected{% endif %}>{{ g.value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="pages_number" class="form-label">Количество страниц</label>
+            <input type="number" class="form-control" id="pages_number" name="pages_number"
+                   value="{{ form_data.pages_number if form_data else '' }}"
+                   min="1" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="img_url" class="form-label">URL обложки (необязательно)</label>
+            <input type="url" class="form-control" id="img_url" name="img_url"
+                   value="{{ form_data.img_url if form_data and form_data.img_url else '' }}"
+                   placeholder="https://example.com/image.jpg">
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+            <a href="{{ url_for('home') }}" class="btn btn-secondary">Отмена</a>
+            <button type="submit" class="btn btn-primary">Добавить книгу</button>
+        </div>
+    </form>
+</div>
+
+{% if errors %}
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #f8d7da;">
+                <h5 class="modal-title" id="errorModalLabel">Ошибка</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <pre style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 0.85rem;">
+                {{- errors -}}
+                </pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+        errorModal.show();
+    });
+</script>
+{% endif %}
+{% endblock %}

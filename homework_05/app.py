@@ -19,3 +19,30 @@
   - добавьте представление для чтения сущности
   - добавьте представление для создания сущности
 """
+from fastapi import FastAPI, staticfiles
+import uvicorn
+from homework_05.routers import root_router
+from homework_05.db import MockDB
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Подключение к БД...")
+    db_client = MockDB()
+
+    app.state.db = db_client
+
+    yield  # Здесь приложение работает и принимает запросы
+
+    # Этот код срабатывает при выключении сервера
+    print("Закрытие соединения с БД...")
+    del app.state.db
+
+app = FastAPI(lifespan=lifespan)
+app.mount("/static", staticfiles.StaticFiles(directory="homework_05/static"), name="static")
+app.include_router(root_router, tags=["books"])
+
+if __name__ == "__main__":
+    db = MockDB()
+    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)

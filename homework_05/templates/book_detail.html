@@ -1,0 +1,28 @@
+{% extends "_base.html" %}
+
+{% block title %}
+Книга "{{ book.title }}"
+{% endblock %}
+
+{% block main_content %}
+<h1>Информация о книге "{{ book.title }}"</h1>
+<div class="row align-items-center">
+    <div class="col-8 d-flex justify-content-center">
+        <div class="book-image">
+            {% if book.img_url %}
+                <img src="{{ book.img_url }}" alt="{{ book.title }}">
+            {% else %}
+                <span class="book-emoji" style="display: block;">📔</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-4 d-flex flex-column gap-1">
+        <span><strong>ID:</strong> {{ book.id }}</span>
+        <span><strong>Автор:</strong> {{ book.author }}</span>
+        <span class="text-truncate" title="{{ book.title }}"><strong>Название:</strong> {{ book.title }}</span>
+        <span><strong>Жанр:</strong> {{ book.genre.value }}</span>
+        <span><strong>Страниц:</strong> {{ book.pages_number }}</span>
+    </div>
+</div>
+{% endblock%}
