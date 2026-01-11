@@ -14,7 +14,8 @@ def client():
 
     from fastapi.testclient import TestClient
 
-    return TestClient(app)
+    with TestClient(app) as c:
+        yield c
 
 
 def test_visit_index(client):
