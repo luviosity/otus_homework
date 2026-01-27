@@ -1,4 +1,4 @@
-from homework_05.schemas import Book, BookGenre, BookCreate
+from homework_03.app.schemas import Book, BookGenre, BookCreate
 from pydantic import TypeAdapter, HttpUrl
 from typing import Optional
 

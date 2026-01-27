@@ -21,10 +21,13 @@
 """
 from fastapi import FastAPI, staticfiles
 import uvicorn
-from homework_05.routers import root_router
-from homework_05.db import MockDB
+from homework_03.app.routers import root_router
+from homework_03.app.db import MockDB
 from contextlib import asynccontextmanager
+import pathlib
 
+BASE_DIR = pathlib.Path(__file__).resolve().parent
+static_path = BASE_DIR / "static"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -40,9 +43,8 @@ async def lifespan(app: FastAPI):
     del app.state.db
 
 app = FastAPI(lifespan=lifespan)
-app.mount("/static", staticfiles.StaticFiles(directory="homework_05/static"), name="static")
+app.mount("/static", staticfiles.StaticFiles(directory=str(static_path)), name="static")
 app.include_router(root_router, tags=["books"])
 
 if __name__ == "__main__":
-    db = MockDB()
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)

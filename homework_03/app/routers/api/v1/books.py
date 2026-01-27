@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from homework_05.schemas import Book, BookCreate
-from homework_05.db import MockDB, get_db
+from homework_03.app.schemas import Book, BookCreate
+from homework_03.app.db import MockDB, get_db
 
 router = APIRouter(prefix='/book')
 
