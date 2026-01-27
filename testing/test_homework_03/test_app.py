@@ -59,11 +59,16 @@ def run_image(docker_client, build_image):
     print("running docker container detached")
     # give some time to for the web app to start
 
-    sleep(5)
-    container.reload()
-    if container.status != 'running':
-        print(container.logs().decode())
-        pytest.fail("Container failed to start")
+    timeout = 0
+    while timeout < RETRIES_TIMEOUT:
+        sleep(TRY_TIMEOUT)
+        timeout += TRY_TIMEOUT
+        container.reload()
+        if container.status == 'running':
+            print("Container is ready!")
+            break
+    else:
+        pytest.fail("Timed out waiting for container")
     yield container
     print("stopping docker container")
     container.stop()

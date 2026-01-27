@@ -1,3 +1,8 @@
+# Команды по сборке образа и запуску контейнера написаны в Marefile.
+# Можно запустить командой "make run" из папки homework_03
+# Для Windows для начала нужно будет установить make
+
+
 FROM astral/uv:python3.13-bookworm-slim
 
 ENV UV_COMPILE_BYTECODE=1 \
