@@ -16,13 +16,14 @@
 import asyncio
 import logging
 
-from config import setup_logging
+from config.settings import settings
 from jsonplaceholder_requests import API_RESPONSE_TYPE, fetch_users_and_posts
 from models import Post, User, async_session
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-setup_logging()
-log = logging.getLogger("homework_04")
+settings.logging.setup()
+log = logging.getLogger(__name__)
 
 
 async def load_users(
@@ -36,7 +37,7 @@ async def load_users(
     users_to_add: list[User] = []
     for user in users:
         new_user = User(
-            external_id=user["id"],
+            id=user["id"],
             name=user["name"],
             username=user["username"],
             email=user["email"],
@@ -54,7 +55,7 @@ async def load_posts(session: AsyncSession, posts: API_RESPONSE_TYPE) -> None:
     posts_to_add: list[Post] = []
     for post in posts:
         new_post = Post(
-            external_id=post["id"],
+            id=post["id"],
             user_id=post["userId"],
             title=post["title"],
             body=post["body"],
@@ -64,12 +65,29 @@ async def load_posts(session: AsyncSession, posts: API_RESPONSE_TYPE) -> None:
     await session.commit()
 
 
+async def sync_identity_sequences(session: AsyncSession) -> None:
+    """Заглушка, чтобы синхронизировать id sequence"""
+    for model in (User, Post):
+        table = model.__table__
+        seq_name = f"{table.name}_id_seq"
+        max_id = await session.scalar(select(func.max(table.c.id)))
+        if max_id is not None:
+            await session.execute(
+                select(func.setval(seq_name, max_id)),
+            )
+    log.info("Identity sequences synced")
+
+
 async def async_main():
     users, posts = await fetch_users_and_posts()
     async with async_session() as session:
         await load_users(session, users)
         await load_posts(session, posts)
+        await sync_identity_sequences(session)
 
 
 if __name__ == "__main__":
+    import uvicorn
+
     asyncio.run(async_main())
+    uvicorn.run("app:app", host="0.0.0.0", port=8001, reload=True)

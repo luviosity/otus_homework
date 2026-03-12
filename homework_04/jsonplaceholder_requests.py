@@ -8,14 +8,13 @@ import logging
 from typing import Any, TypeAlias
 
 import aiohttp
-from config import get_settings
+from config.settings import settings
 from errors import ApiError
 
-settings = get_settings()
-USERS_DATA_URL = f"{settings.api_url}/users"
-POSTS_DATA_URL = f"{settings.api_url}/posts"
+USERS_DATA_URL = f"{settings.api.jsonplaceholder_url}/users"
+POSTS_DATA_URL = f"{settings.api.jsonplaceholder_url}/posts"
 
-log = logging.getLogger("homework_04")
+log = logging.getLogger(__name__)
 
 API_RESPONSE_TYPE: TypeAlias = list[dict[str, Any]]
 

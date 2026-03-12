@@ -8,7 +8,7 @@
 создайте связи relationship между моделями: User.posts и Post.user
 """
 
-from config import get_settings
+from config.settings import settings
 from sqlalchemy import (
     BigInteger,
     CheckConstraint,
@@ -28,9 +28,6 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-settings = get_settings()
-
-PG_CONN_URI = settings.sqlalchemy_pg_conn_uri
 convention = {
     "ix": "ix_%(column_0_label)s",
     "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -40,8 +37,8 @@ convention = {
 }
 
 engine = create_async_engine(
-    url=settings.sqlalchemy_pg_conn_uri,
-    echo=settings.sqla_db_echo,
+    url=settings.db.url,
+    echo=settings.db.sqla.echo,
 )
 
 async_session = async_sessionmaker(
@@ -59,8 +56,7 @@ class Base(DeclarativeBase):
 
 
 class User(Base):
-    id: Mapped[int] = mapped_column(primary_key=True, server_default=Identity())
-    external_id: Mapped[int] = mapped_column(BigInteger, index=True, unique=True)
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
     name: Mapped[str] = mapped_column(
         Text,
     )
@@ -92,9 +88,8 @@ class User(Base):
 
 
 class Post(Base):
-    id: Mapped[int] = mapped_column(primary_key=True, server_default=Identity())
-    external_id: Mapped[int] = mapped_column(BigInteger, index=True, unique=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.external_id"))
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     title: Mapped[str] = mapped_column(
         Text,
     )
